@@ -1,5 +1,6 @@
 import { Router } from 'express';
 
+import sessionController from './app/controller/sessionController';
 import userController from './app/controller/userController';
 
 const routes = Router();
@@ -13,5 +14,6 @@ routes.route('/users/:id')
   .put(userController.update)
   .delete(userController.delete);
 
+routes.post('/sessions', sessionController.create);
 
 export default routes;
