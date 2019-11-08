@@ -9,7 +9,8 @@
         "no-console": false,
         "quotemark": [true, "single"],
         "member-access": [true, "no-public"],
-        "variable-name": [false]
+        "variable-name": [false],
+        "object-literal-sort-keys": [false]
     },
     "rulesDirectory": []
 }

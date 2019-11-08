@@ -16,6 +16,7 @@
     "@types/jsonwebtoken": "^8.3.5",
     "@types/node": "^12.12.6",
     "@types/pg": "^7.11.2",
+    "@types/yup": "^0.26.24",
     "nodemon": "^1.19.4",
     "ts-node": "^8.4.1",
     "tslint": "^5.20.1",
@@ -29,6 +30,7 @@
     "path": "^0.12.7",
     "pg": "^7.12.1",
     "reflect-metadata": "^0.1.13",
-    "typeorm": "^0.2.20"
+    "typeorm": "^0.2.20",
+    "yup": "^0.27.0"
   }
 }

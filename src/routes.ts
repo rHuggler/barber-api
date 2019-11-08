@@ -12,7 +12,7 @@ routes.route('/users')
 
 routes.route('/users/:id')
   .get(userController.show)
-  .delete(userController.delete)
+  .delete([userAuth], userController.delete)
   .put([userAuth], userController.update);
 
 routes.route('/sessions')

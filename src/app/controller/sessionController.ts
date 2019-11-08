@@ -3,14 +3,19 @@ import jwt from 'jsonwebtoken';
 
 import authConfig from '../../config/authConfig';
 import User from '../entity/user';
+import { sessionSchema } from './validator/sessionValidator';
 
 class SessionController {
   async create(req: Request, res: Response) {
+    if (!sessionSchema.isValidSync(req.body)) {
+      return res.status(400).json({ error: 'Incorrect or missing payload.' });
+    }
+
     const { email, password } = req.body;
 
     const user = await User.findOne({ where: { email } });
     if (!user) {
-      return res.status(400).json({ error: 'User does not exists.'});
+      return res.status(400).json({ error: 'User does not exists.' });
     }
 
     const passwordMatches = user.checkPassword(password);
@@ -22,8 +27,8 @@ class SessionController {
     const { id, name } = user;
 
     return res.json({
-      token: jwt.sign({ id }, authConfig.secret, authConfig.signOptions),
       user: { email, id, name },
+      token: jwt.sign({ id }, authConfig.secret, authConfig.signOptions),
     });
 
   }
