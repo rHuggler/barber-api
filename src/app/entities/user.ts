@@ -6,8 +6,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  OneToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn } from 'typeorm';
+  UpdateDateColumn} from 'typeorm';
+
+import File from './file';
 
 @Entity()
 export default class User extends BaseEntity {
@@ -27,6 +31,12 @@ export default class User extends BaseEntity {
     default: false,
   })
   provider!: boolean;
+
+  @OneToOne('File')
+  @JoinColumn({
+    name: 'avatar_id',
+  })
+  avatarId!: File;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;

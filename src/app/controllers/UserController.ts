@@ -65,10 +65,6 @@ class UserController {
       }
     }
 
-    if (!oldPassword) {
-      return res.status(401).json({ error: 'Missing required parameter: oldPassword' });
-    }
-
     if (!user.checkPassword(oldPassword)) {
       return res.status(401).json({ error: 'Invalid or incorrect password.' });
     }
@@ -76,7 +72,9 @@ class UserController {
     const updatedUser = User.merge(user, req.body);
     await updatedUser.save();
 
-    return res.status(200).json(updatedUser);
+    const { id, name, provider, avatarId } = updatedUser;
+
+    return res.status(200).json({ id, name, email, provider, avatarId});
   }
 
   async delete(req: Request, res: Response): Promise<Response> {

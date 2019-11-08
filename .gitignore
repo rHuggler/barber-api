@@ -106,3 +106,5 @@ dist
 # VSCode workspace settings
 .vscode/
 
+# Temporary files
+tmp/
