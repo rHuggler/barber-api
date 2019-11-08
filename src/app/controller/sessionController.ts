@@ -1,8 +1,8 @@
+import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
+import authConfig from '../../config/authConfig';
 import User from '../entity/user';
-
-import { Request, Response } from 'express';
 
 class SessionController {
   async create(req: Request, res: Response) {
@@ -22,7 +22,7 @@ class SessionController {
     const { id, name } = user;
 
     return res.json({
-      token: jwt.sign({ id }, 's3cr3t', { expiresIn: '7d' }),
+      token: jwt.sign({ id }, authConfig.secret, authConfig.signOptions),
       user: { email, id, name },
     });
 

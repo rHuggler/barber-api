@@ -35,17 +35,17 @@ class UserController {
     return res.status(200).json(users);
   }
 
-  async update(req: Request, res: Response): Promise<Response> {
-    req.body.id = req.params.id;
-    const user: User | undefined = await User.preload(req.body);
+  async update(_req: Request, res: Response): Promise<Response> {
 
-    if (!user) {
-      return res.status(400).json({ error: 'User does not exists.' });
-    }
+    return res.status(403).send();
 
-    await user.save();
+    // if (!user) {
+    //   return res.status(400).json({ error: 'User does not exists.' });
+    // }
 
-    return res.status(200).json(user);
+    // await user.save();
+
+    // return res.status(200).json(user);
   }
 
   async delete(req: Request, res: Response): Promise<Response> {

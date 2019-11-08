@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import sessionController from './app/controller/sessionController';
 import userController from './app/controller/userController';
+import userAuth from './app/middleware/auth';
 
 const routes = Router();
 
@@ -11,9 +12,10 @@ routes.route('/users')
 
 routes.route('/users/:id')
   .get(userController.show)
-  .put(userController.update)
-  .delete(userController.delete);
+  .put([userAuth], userController.update)
+  .delete([userAuth], userController.delete);
 
-routes.post('/sessions', sessionController.create);
+routes.route('/sessions')
+  .post(sessionController.create);
 
 export default routes;
