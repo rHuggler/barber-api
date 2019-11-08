@@ -12,8 +12,8 @@ routes.route('/users')
 
 routes.route('/users/:id')
   .get(userController.show)
-  .put([userAuth], userController.update)
-  .delete([userAuth], userController.delete);
+  .delete(userController.delete)
+  .put([userAuth], userController.update);
 
 routes.route('/sessions')
   .post(sessionController.create);

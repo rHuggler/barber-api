@@ -11,7 +11,7 @@ class UserController {
       return res.status(409).json({ error: 'User already exists.' });
     }
 
-    const user: User = User.create(req.body);
+    const user = User.create(req.body);
     await user.save();
 
     const { id, name, provider } = user;
@@ -19,7 +19,7 @@ class UserController {
   }
 
   async show(req: Request, res: Response): Promise<Response> {
-    const user: User | undefined = await User.findOne(req.params.id);
+    const user = await User.findOne(req.params.id);
 
     if (!user) {
       return res.status(400).json({ error: 'User does not exists.' });
@@ -30,26 +30,48 @@ class UserController {
   }
 
   async list(_req: Request, res: Response): Promise<Response> {
-    const users: User[] = await User.find();
+    const users = await User.find();
 
     return res.status(200).json(users);
   }
 
-  async update(_req: Request, res: Response): Promise<Response> {
+  async update(req: Request, res: Response): Promise<Response> {
+    if (req.params.id !== res.locals.id) {
+      return res.status(401).json({ error: 'Invalid or expired token.' });
+    }
 
-    return res.status(403).send();
+    const user = await User.findOne(req.params.id);
 
-    // if (!user) {
-    //   return res.status(400).json({ error: 'User does not exists.' });
-    // }
+    if (!user) {
+      return res.status(400).json({ error: 'User does not exists.' });
+    }
 
-    // await user.save();
+    const { email, oldPassword } = req.body;
 
-    // return res.status(200).json(user);
+    if (email !== user.email) {
+      const userExists = await User.findOne({ where: { email } });
+
+      if (userExists) {
+        return res.status(409).json({ error: 'Email already in use.' });
+      }
+    }
+
+    if (!oldPassword) {
+      return res.status(401).json({ error: 'Missing required parameter: oldPassword' });
+    }
+
+    if (!user.checkPassword(oldPassword)) {
+      return res.status(401).json({ error: 'Invalid or incorrect password.' });
+    }
+
+    const updatedUser = User.merge(user, req.body);
+    await updatedUser.save();
+
+    return res.status(200).json(updatedUser);
   }
 
-  async delete(req: Request, res: Response): Promise<Response> {
-    const user: User | undefined = await User.findOne(req.params.id);
+  async delete(_req: Request, res: Response): Promise<Response> {
+    const user = await User.findOne(res.locals.id);
 
     if (!user) {
       return res.status(400).json({ error: 'User does not exists.' });
