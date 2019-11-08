@@ -19,23 +19,23 @@ class UserController {
     const user = User.create(req.body);
     await user.save();
 
-    const { id, name, provider } = user;
-    return res.status(200).json({ id, name, email, provider});
+    const { id, name, provider, avatarId } = user;
+    return res.status(200).json({ id, name, email, provider, avatarId });
   }
 
   async show(req: Request, res: Response): Promise<Response> {
-    const user = await User.findOne({ where: { id: req.params.id} });
+    const user = await User.findOne({ where: { id: req.params.id }, loadRelationIds: true });
 
     if (!user) {
       return res.status(400).json({ error: 'User does not exists.' });
     }
 
-    const { id, name, email, provider } = user;
-    return res.status(200).json({ id, name, email, provider});
+    const { id, name, email, provider, avatarId } = user;
+    return res.status(200).json({ id, name, email, provider, avatarId });
   }
 
   async list(_req: Request, res: Response): Promise<Response> {
-    const users = await User.find();
+    const users = await User.find({ loadRelationIds: true });
 
     return res.status(200).json(users);
   }
@@ -49,7 +49,7 @@ class UserController {
       return res.status(401).json({ error: 'Invalid or expired token.' });
     }
 
-    const user = await User.findOne({ where: { id: req.params.id} });
+    const user = await User.findOne({ where: { id: req.params.id }, loadRelationIds: true });
 
     if (!user) {
       return res.status(400).json({ error: 'User does not exists.' });
@@ -65,7 +65,7 @@ class UserController {
       }
     }
 
-    if (!user.checkPassword(oldPassword)) {
+    if (oldPassword && !user.checkPassword(oldPassword)) {
       return res.status(401).json({ error: 'Invalid or incorrect password.' });
     }
 

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import multer from 'multer';
 
 import FileController from './app/controllers/FileController';
+import ProviderController from './app/controllers/ProviderController';
 import SessionController from './app/controllers/SessionController';
 import UserController from './app/controllers/UserController';
 import userAuth from './app/middlewares/auth';
@@ -18,6 +19,9 @@ routes.route('/users/:id')
   .get(UserController.show)
   .delete([userAuth], UserController.delete)
   .put([userAuth], UserController.update);
+
+routes.route('/providers')
+  .get(ProviderController.list);
 
 routes.route('/sessions')
   .post(SessionController.create);

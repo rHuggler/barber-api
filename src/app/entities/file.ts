@@ -1,10 +1,11 @@
 import {
+  AfterLoad,
   BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
-  UpdateDateColumn } from 'typeorm';
+  UpdateDateColumn} from 'typeorm';
 
 @Entity()
 export default class File extends BaseEntity {
@@ -22,4 +23,11 @@ export default class File extends BaseEntity {
 
   @UpdateDateColumn({ name: 'updated_at'})
   updatedAt!: Date;
+
+  protected url!: string;
+
+  @AfterLoad()
+  getUrl() {
+    this.url = `http://localhost:5000/files/${this.path}`;
+  }
 }

@@ -2,6 +2,7 @@ import 'reflect-metadata';
 
 import express, { Application } from 'express';
 
+import { resolve } from 'path';
 import routes from './routes';
 
 class App {
@@ -16,6 +17,7 @@ class App {
 
   private middlewares(): void {
     this.server.use(express.json());
+    this.server.use('/files', express.static(resolve(__dirname, '..', 'tmp', 'uploads')));
   }
 
   private routes(): void {
