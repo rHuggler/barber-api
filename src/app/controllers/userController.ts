@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
-import User from '../entity/user';
-import { userSchema, userUpdateSchema } from './validator/userValidator';
+import User from '../entities/user';
+import { userSchema, userUpdateSchema } from './validators/userValidator';
 
 class UserController {
   async create(req: Request, res: Response): Promise<Response> {

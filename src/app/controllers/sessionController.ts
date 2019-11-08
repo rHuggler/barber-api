@@ -2,8 +2,8 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
 import authConfig from '../../config/authConfig';
-import User from '../entity/user';
-import { sessionSchema } from './validator/sessionValidator';
+import User from '../entities/user';
+import { sessionSchema } from './validators/sessionValidator';
 
 class SessionController {
   async create(req: Request, res: Response) {
