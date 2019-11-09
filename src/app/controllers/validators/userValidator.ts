@@ -22,4 +22,6 @@ export const userUpdateSchema = yup.object().shape({
     .when('password', (password: string, field: yup.StringSchema) =>
       password ? field.required().oneOf([yup.ref('password')]) : field,
     ),
+}).test('at-least-one', 'Invalid or missing payload.', (payload) => {
+  return Object.keys(payload).some((value) => !!value);
 });

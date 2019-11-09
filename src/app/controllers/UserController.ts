@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
+import { FindOneOptions } from 'typeorm';
 
-import User from '../entities/user';
+import User from '../entities/User';
 import { userSchema, userUpdateSchema } from './validators/userValidator';
 
 class UserController {
@@ -49,7 +50,19 @@ class UserController {
       return res.status(401).json({ error: 'Invalid or expired token.' });
     }
 
-    const user = await User.findOne({ where: { id: req.params.id }, loadRelationIds: true });
+    const select = ['id', 'email', 'name', 'avatarId', 'provider'];
+
+    if (req.body.oldPassword) {
+      select.push('password');
+    }
+
+    const findOptions: FindOneOptions = {
+      where: { id: req.params.id },
+      loadRelationIds: true,
+      select,
+    };
+
+    const user = await User.findOne(findOptions);
 
     if (!user) {
       return res.status(400).json({ error: 'User does not exists.' });
@@ -72,9 +85,14 @@ class UserController {
     const updatedUser = User.merge(user, req.body);
     await updatedUser.save();
 
-    const { id, name, provider, avatarId } = updatedUser;
-
-    return res.status(200).json({ id, name, email, provider, avatarId});
+    return res.status(200).json({
+      id: updatedUser.id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      provider: updatedUser.provider,
+      avatarId: updatedUser.avatarId,
+      updatedAt: updatedUser.updatedAt,
+    });
   }
 
   async delete(req: Request, res: Response): Promise<Response> {
@@ -91,6 +109,23 @@ class UserController {
     await user.remove();
 
     return res.status(204).send();
+  }
+
+  async regenPassword(req: Request, res: Response): Promise<Response> {
+    const { id } = req.params;
+
+    const user = await User.findOne({
+      where: { id },
+      select: ['id', 'name', 'email', 'password', 'provider', 'avatarId'],
+    });
+    if (!user) {
+      return res.status(400).json({ error: 'User does not exists.' });
+    }
+
+    const password = user.regeneratePassword();
+    await user.save();
+
+    return res.status(200).json({ password });
   }
 }
 

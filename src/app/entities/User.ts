@@ -1,4 +1,5 @@
 import { compareSync, hashSync } from 'bcryptjs';
+import { randomBytes } from 'crypto';
 import {
   BaseEntity,
   BeforeInsert,
@@ -11,7 +12,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn} from 'typeorm';
 
-import File from './file';
+import File from './File';
 
 @Entity()
 export default class User extends BaseEntity {
@@ -46,11 +47,18 @@ export default class User extends BaseEntity {
 
   @BeforeInsert()
   @BeforeUpdate()
-  encryptPassword() {
-    this.password = hashSync(this.password, 6);
+  encryptPassword(): void {
+    if (this.password) {
+      this.password = hashSync(this.password, 6);
+    }
   }
 
   checkPassword(password: string): boolean {
     return compareSync(password, this.password);
+  }
+
+  regeneratePassword(): string {
+    this.password = randomBytes(8).toString('hex');
+    return this.password;
   }
 }

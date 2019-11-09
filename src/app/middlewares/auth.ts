@@ -4,11 +4,9 @@ import { verify } from 'jsonwebtoken';
 import authConfig from '../../config/authConfig';
 
 interface IDecodedToken {
-  payload: {
     id: number;
     iat: number;
     exp?: number;
-  };
 }
 
 async function userAuth(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
@@ -21,8 +19,8 @@ async function userAuth(req: Request, res: Response, next: NextFunction): Promis
   const [, token] = authHeader.split(' ');
 
   try {
-    const decoded = verify(token, authConfig.secret, authConfig.verifyOptions);
-    res.locals.id = (decoded as IDecodedToken).payload.id.toString();
+    const decoded = verify(token, authConfig.secret);
+    res.locals.id = (decoded as IDecodedToken).id.toString();
   } catch (err) {
     return res.status(401).json({ error: 'Invalid or expired token.' });
   }

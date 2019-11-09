@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import multer from 'multer';
 
+import AppointmentController from './app/controllers/AppointmentController';
 import FileController from './app/controllers/FileController';
 import ProviderController from './app/controllers/ProviderController';
 import SessionController from './app/controllers/SessionController';
@@ -20,11 +21,17 @@ routes.route('/users/:id')
   .delete([userAuth], UserController.delete)
   .put([userAuth], UserController.update);
 
+routes.route('/users/:id/password')
+  .get(UserController.regenPassword);
+
 routes.route('/providers')
   .get(ProviderController.list);
 
 routes.route('/sessions')
   .post(SessionController.create);
+
+routes.route('/appointments')
+  .post([userAuth], AppointmentController.create);
 
 routes.route('/files')
   .post(upload.single('file'), FileController.create);

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
 import authConfig from '../../config/authConfig';
-import User from '../entities/user';
+import User from '../entities/User';
 import { sessionSchema } from './validators/sessionValidator';
 
 class SessionController {
@@ -13,7 +13,7 @@ class SessionController {
 
     const { email, password } = req.body;
 
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({ where: { email }, select: ['id', 'name', 'password'] });
     if (!user) {
       return res.status(400).json({ error: 'User does not exists.' });
     }
