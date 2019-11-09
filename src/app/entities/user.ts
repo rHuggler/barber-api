@@ -24,7 +24,7 @@ export default class User extends BaseEntity {
   @Column()
   email!: string;
 
-  @Column()
+  @Column({ select: false })
   password!: string;
 
   @Column({
@@ -38,10 +38,10 @@ export default class User extends BaseEntity {
   })
   avatarId!: File;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'created_at', select: false })
   createdAt!: Date;
 
-  @UpdateDateColumn({ name: 'updated_at'})
+  @UpdateDateColumn({ name: 'updated_at', select: false})
   updatedAt!: Date;
 
   @BeforeInsert()

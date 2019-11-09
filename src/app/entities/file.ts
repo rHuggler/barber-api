@@ -18,10 +18,10 @@ export default class File extends BaseEntity {
   @Column()
   path!: string;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'created_at', select: false })
   createdAt!: Date;
 
-  @UpdateDateColumn({ name: 'updated_at'})
+  @UpdateDateColumn({ name: 'updated_at', select: false })
   updatedAt!: Date;
 
   protected url!: string;
