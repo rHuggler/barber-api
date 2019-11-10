@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { FindOneOptions } from 'typeorm';
 
 import User from '../entities/User';
 import { userSchema, userUpdateSchema } from './validators/userValidator';
@@ -12,7 +11,11 @@ class UserController {
 
     const { email } = req.body;
 
-    const userExists = await User.findOne({ where: { email } });
+    const userExists = await User.getRepository()
+      .createQueryBuilder()
+      .where({ email })
+      .getOne();
+
     if (userExists) {
       return res.status(409).json({ error: 'User already exists.' });
     }
@@ -25,7 +28,11 @@ class UserController {
   }
 
   async show(req: Request, res: Response): Promise<Response> {
-    const user = await User.findOne({ where: { id: req.params.id }, loadRelationIds: true });
+    const user = await User.getRepository()
+      .createQueryBuilder('user')
+      .where({ id: req.params.id })
+      .loadAllRelationIds()
+      .getOne();
 
     if (!user) {
       return res.status(400).json({ error: 'User does not exists.' });
@@ -36,7 +43,10 @@ class UserController {
   }
 
   async list(_req: Request, res: Response): Promise<Response> {
-    const users = await User.find({ loadRelationIds: true });
+    const users = await User.getRepository()
+      .createQueryBuilder()
+      .loadAllRelationIds()
+      .getMany();
 
     return res.status(200).json(users);
   }
@@ -50,19 +60,22 @@ class UserController {
       return res.status(401).json({ error: 'Invalid or expired token.' });
     }
 
-    const select = ['id', 'email', 'name', 'avatarId', 'provider'];
+    let user: User | undefined;
 
     if (req.body.oldPassword) {
-      select.push('password');
+      user = await User.getRepository()
+      .createQueryBuilder('user')
+      .where({ id: res.locals.id })
+      .addSelect('user.password')
+      .loadAllRelationIds()
+      .getOne();
+    } else {
+      user = await User.getRepository()
+        .createQueryBuilder()
+        .where({ id: res.locals.id })
+        .loadAllRelationIds()
+        .getOne();
     }
-
-    const findOptions: FindOneOptions = {
-      where: { id: req.params.id },
-      loadRelationIds: true,
-      select,
-    };
-
-    const user = await User.findOne(findOptions);
 
     if (!user) {
       return res.status(400).json({ error: 'User does not exists.' });
@@ -71,7 +84,10 @@ class UserController {
     const { email, oldPassword } = req.body;
 
     if (email !== user.email) {
-      const userExists = await User.findOne({ where: { email } });
+      const userExists = await User.getRepository()
+        .createQueryBuilder()
+        .where({ email })
+        .getOne();
 
       if (userExists) {
         return res.status(409).json({ error: 'Email already in use.' });
@@ -82,17 +98,15 @@ class UserController {
       return res.status(401).json({ error: 'Invalid or incorrect password.' });
     }
 
-    const updatedUser = User.merge(user, req.body);
-    await updatedUser.save();
+    await User.merge(user, req.body).save();
 
-    return res.status(200).json({
-      id: updatedUser.id,
-      name: updatedUser.name,
-      email: updatedUser.email,
-      provider: updatedUser.provider,
-      avatarId: updatedUser.avatarId,
-      updatedAt: updatedUser.updatedAt,
-    });
+    const updatedUser = await User.getRepository()
+      .createQueryBuilder()
+      .where({ id: res.locals.id })
+      .loadAllRelationIds()
+      .getOne();
+
+    return res.status(200).json(updatedUser);
   }
 
   async delete(req: Request, res: Response): Promise<Response> {
@@ -100,7 +114,10 @@ class UserController {
       return res.status(401).json({ error: 'Invalid or expired token.' });
     }
 
-    const user = await User.findOne({ where: { id: res.locals.id} });
+    const user = await User.getRepository()
+      .createQueryBuilder()
+      .where({ id: res.locals.id })
+      .getOne();
 
     if (!user) {
       return res.status(400).json({ error: 'User does not exists.' });
@@ -114,10 +131,13 @@ class UserController {
   async regenPassword(req: Request, res: Response): Promise<Response> {
     const { id } = req.params;
 
-    const user = await User.findOne({
-      where: { id },
-      select: ['id', 'name', 'email', 'password', 'provider', 'avatarId'],
-    });
+    const user = await User.getRepository()
+      .createQueryBuilder('user')
+      .where({ id })
+      .addSelect('user.password')
+      .loadAllRelationIds()
+      .getOne();
+
     if (!user) {
       return res.status(400).json({ error: 'User does not exists.' });
     }

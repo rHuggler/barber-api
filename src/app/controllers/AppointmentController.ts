@@ -12,10 +12,13 @@ class AppointmentController {
 
     const { providerId } = req.body;
 
-    const isProvider = await User.findOne({ where: { id: providerId, provider: true } });
+    const isProvider = await User.getRepository()
+      .createQueryBuilder()
+      .where({ id: providerId, provider: true })
+      .getOne();
 
     if (!isProvider) {
-      return res.status(400).json({ error: 'Invalid provider.' });
+      return res.status(400).json({ error: 'User is not provider.' });
     }
 
     const appointment = Appointment.create(req.body);

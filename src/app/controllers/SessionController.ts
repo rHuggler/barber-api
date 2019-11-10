@@ -13,7 +13,12 @@ class SessionController {
 
     const { email, password } = req.body;
 
-    const user = await User.findOne({ where: { email }, select: ['id', 'name', 'password'] });
+    const user = await User.getRepository()
+      .createQueryBuilder('user')
+      .where({ email })
+      .addSelect('user.password')
+      .getOne();
+
     if (!user) {
       return res.status(400).json({ error: 'User does not exists.' });
     }
