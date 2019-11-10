@@ -18,11 +18,13 @@ class AppointmentController {
       .getOne();
 
     if (!isProvider) {
-      return res.status(400).json({ error: 'User is not provider.' });
+      return res.status(400).json({ error: 'Invalid provider.' });
     }
 
-    const appointment = Appointment.create(req.body);
-    await appointment.save();
+    const appointment = await Appointment.create({
+      userId: res.locals.id,
+      ...req.body,
+    }).save();
 
     return res.status(200).json(appointment);
   }

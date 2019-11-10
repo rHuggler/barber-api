@@ -20,8 +20,7 @@ class UserController {
       return res.status(409).json({ error: 'User already exists.' });
     }
 
-    const user = User.create(req.body);
-    await user.save();
+    const user = await User.create(req.body).save();
 
     const { id, name, provider, avatarId } = user;
     return res.status(200).json({ id, name, email, provider, avatarId });
@@ -38,8 +37,7 @@ class UserController {
       return res.status(400).json({ error: 'User does not exists.' });
     }
 
-    const { id, name, email, provider, avatarId } = user;
-    return res.status(200).json({ id, name, email, provider, avatarId });
+    return res.status(200).json(user);
   }
 
   async list(_req: Request, res: Response): Promise<Response> {

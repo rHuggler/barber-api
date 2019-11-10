@@ -12,8 +12,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn} from 'typeorm';
 
-import File from './File';
-
 @Entity()
 export default class User extends BaseEntity {
   @PrimaryGeneratedColumn()
@@ -37,7 +35,7 @@ export default class User extends BaseEntity {
   @JoinColumn({
     name: 'avatar_id',
   })
-  avatarId!: File;
+  avatarId!: number;
 
   @CreateDateColumn({ name: 'created_at', select: false })
   createdAt!: Date;

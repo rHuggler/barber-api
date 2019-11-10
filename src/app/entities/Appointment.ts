@@ -4,11 +4,9 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
-  OneToOne,
+  ManyToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn} from 'typeorm';
-
-import User from './User';
+  UpdateDateColumn } from 'typeorm';
 
 @Entity()
 export default class Appointment extends BaseEntity {
@@ -21,16 +19,17 @@ export default class Appointment extends BaseEntity {
   @Column({ name: 'canceled_at', nullable: true })
   canceledAt!: Date;
 
-  @OneToOne('User')
+  @ManyToOne('User')
   @JoinColumn({
     name: 'user_id',
   })
-  userId!: User;
+  userId!: number;
 
+  @ManyToOne('User')
   @JoinColumn({
     name: 'provider_id',
   })
-  providerId!: User;
+  providerId!: number;
 
   @CreateDateColumn({ name: 'created_at', select: false })
   createdAt!: Date;
