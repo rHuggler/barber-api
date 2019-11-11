@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import User from '../entities/User';
+import User from '../entities/sql/User';
 import { userSchema, userUpdateSchema } from './validators/userValidator';
 
 class UserController {
@@ -62,11 +62,11 @@ class UserController {
 
     if (req.body.oldPassword) {
       user = await User.getRepository()
-      .createQueryBuilder('user')
-      .where({ id: res.locals.id })
-      .addSelect('user.password')
-      .loadAllRelationIds()
-      .getOne();
+        .createQueryBuilder('user')
+        .where({ id: res.locals.id })
+        .addSelect('user.password')
+        .loadAllRelationIds()
+        .getOne();
     } else {
       user = await User.getRepository()
         .createQueryBuilder()

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import File from '../entities/File';
+import File from '../entities/sql/File';
 
 class FileController {
   async create(req: Request, res: Response): Promise<Response> {
