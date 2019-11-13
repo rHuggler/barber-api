@@ -2,8 +2,8 @@ import { endOfDay, parseISO, startOfDay } from 'date-fns';
 import { Request, Response } from 'express';
 import { Between } from 'typeorm';
 
-import Appointment from '../entities/sql/Appointment';
-import User from '../entities/sql/User';
+import Appointment from '../entities/models/Appointment';
+import User from '../entities/models/User';
 
 class ScheduleController {
   async list(req: Request, res: Response): Promise<Response> {

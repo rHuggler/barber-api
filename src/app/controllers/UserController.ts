@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import User from '../entities/sql/User';
+import User from '../entities/models/User';
 import { userSchema, userUpdateSchema } from './validators/userValidator';
 
 class UserController {

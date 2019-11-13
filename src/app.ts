@@ -1,8 +1,10 @@
 import 'reflect-metadata';
 
 import express, { Application } from 'express';
-
 import { resolve } from 'path';
+import { createConnection } from 'typeorm';
+
+import postgresConfig from './config/database';
 import routes from './routes';
 
 class App {
@@ -11,8 +13,13 @@ class App {
   constructor() {
     this.server = express();
 
+    this.databases();
     this.middlewares();
     this.routes();
+  }
+
+  private databases(): void {
+    createConnection(postgresConfig);
   }
 
   private middlewares(): void {

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import User from '../entities/sql/User';
+import User from '../entities/models/User';
 
 class ProviderController {
   async list(_req: Request, res: Response): Promise<Response> {

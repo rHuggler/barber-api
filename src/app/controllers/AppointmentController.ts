@@ -1,9 +1,9 @@
 import { parseISO, startOfHour } from 'date-fns';
 import { Request, Response } from 'express';
 
-import Notification from '../entities/no-sql/Notification';
-import Appointment from '../entities/sql/Appointment';
-import User from '../entities/sql/User';
+import Notification from '../entities/schemas/Notification';
+import Appointment from '../entities/models/Appointment';
+import User from '../entities/models/User';
 import { appointmentSchema, validateDate } from './validators/appointmentValidator';
 
 class AppointmentController {

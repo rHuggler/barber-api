@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
-import authConfig from '../../config/authConfig';
-import User from '../entities/sql/User';
+import authConfig from '../../config/auth';
+import User from '../entities/models/User';
 import { sessionSchema } from './validators/sessionValidator';
 
 class SessionController {

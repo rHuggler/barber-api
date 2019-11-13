@@ -1,6 +1,6 @@
 import { isBefore, parseISO, startOfHour } from 'date-fns';
 import * as yup from 'yup';
-import Appointment from '../../entities/sql/Appointment';
+import Appointment from '../../entities/models/Appointment';
 
 export const appointmentSchema = yup.object().shape({
   date: yup.string().required(),
