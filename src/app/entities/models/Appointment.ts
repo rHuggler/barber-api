@@ -14,7 +14,7 @@ export default class Appointment extends BaseEntity {
   id!: number;
 
   @Column()
-  date!: string;
+  date!: Date;
 
   @Column({ name: 'canceled_at', nullable: true })
   canceledAt!: Date;

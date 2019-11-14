@@ -1,10 +1,11 @@
 import 'reflect-metadata';
 
 import express, { Application } from 'express';
+import mongoose from 'mongoose';
 import { resolve } from 'path';
 import { createConnection } from 'typeorm';
 
-import postgresConfig from './config/database';
+import { mongoConfig, postgresConfig } from './config/database';
 import routes from './routes';
 
 class App {
@@ -20,6 +21,7 @@ class App {
 
   private databases(): void {
     createConnection(postgresConfig);
+    mongoose.connect('mongodb://localhost/barber', mongoConfig);
   }
 
   private middlewares(): void {

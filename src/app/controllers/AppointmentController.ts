@@ -1,9 +1,9 @@
-import { parseISO, startOfHour } from 'date-fns';
+import { format, parseISO, startOfHour } from 'date-fns';
 import { Request, Response } from 'express';
 
-import Notification from '../entities/schemas/Notification';
 import Appointment from '../entities/models/Appointment';
 import User from '../entities/models/User';
+import Notification from '../entities/schemas/Notification';
 import { appointmentSchema, validateDate } from './validators/appointmentValidator';
 
 class AppointmentController {
@@ -29,7 +29,7 @@ class AppointmentController {
       return res.status(400).json({ error: dateError });
     }
 
-    const hourStart = startOfHour(parseISO(date)).toISOString();
+    const hourStart = startOfHour(parseISO(date));
 
     const appointment = await Appointment.create({
       userId: res.locals.id,
@@ -37,10 +37,23 @@ class AppointmentController {
       date: hourStart,
     }).save();
 
+    const user = await User.getRepository()
+      .createQueryBuilder('user')
+      .select('user.name')
+      .where({ id: res.locals.id })
+      .getOne();
+
+    if (!user) {
+      return res.status(400).json({ error: 'User not found.' });
+    }
+
+    const formattedDate = format(hourStart, 'MMMM do');
+    const formattedTime = format(hourStart, 'h:mma');
+
     await Notification.create({
-      content: 'New appointment for you.',
-      userId: req.body.providerId,
-    }).save();
+      content: `New appointment for ${user.name} on ${formattedDate} at ${formattedTime}`,
+      user: req.body.providerId,
+    });
 
     return res.status(200).json(appointment);
   }

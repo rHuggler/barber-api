@@ -16,7 +16,7 @@ export async function validateDate(id: number, date: string): Promise<string|und
 
   const appointment = await Appointment.getRepository()
     .createQueryBuilder()
-    .where({ providerId: id, canceledAt: null, date: hourStart.toISOString() })
+    .where({ providerId: id, canceledAt: null, date: hourStart })
     .getOne();
 
   if (appointment) {

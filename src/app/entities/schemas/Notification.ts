@@ -1,22 +1,27 @@
-import { BaseEntity, Column, CreateDateColumn, Entity, ObjectID, ObjectIdColumn, UpdateDateColumn } from 'typeorm';
+import { Document, model, Schema } from 'mongoose';
 
-@Entity()
-export default class Notification extends BaseEntity {
-  @ObjectIdColumn()
-  id!: ObjectID;
+const NotificationSchema = new Schema({
+  content: {
+    type: String,
+    required: true,
+  },
+  user: {
+    type: Number,
+    required: true,
+  },
+  read: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+}, {
+  timestamps: true,
+});
 
-  @Column()
-  content!: string;
-
-  @Column()
-  userId!: number;
-
-  @Column({ default: false })
-  read!: boolean;
-
-  @CreateDateColumn()
-  createdAt!: Date;
-
-  @UpdateDateColumn()
-  updatedAt!: Date;
+interface INotification extends Document {
+  content: string;
+  user: number;
+  read?: boolean;
 }
+
+export default model<INotification>('Notification', NotificationSchema);

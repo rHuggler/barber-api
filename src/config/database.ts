@@ -1,6 +1,7 @@
-import { ConnectionOptions } from 'typeorm';
+import { ConnectionOptions as MongoOptions } from 'mongoose';
+import { ConnectionOptions as PostgresOptions } from 'typeorm';
 
-const config: ConnectionOptions = {
+export const postgresConfig: PostgresOptions = {
   type: 'postgres',
   host: 'localhost',
   port: 5432,
@@ -25,4 +26,8 @@ const config: ConnectionOptions = {
   },
 };
 
-export default config;
+export const mongoConfig: MongoOptions = {
+  useNewUrlParser: true,
+  useFindAndModify: true,
+  useUnifiedTopology: true,
+};
