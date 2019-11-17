@@ -20,7 +20,7 @@ async function userAuth(req: Request, res: Response, next: NextFunction): Promis
 
   try {
     const decoded = verify(token, authConfig.secret);
-    res.locals.id = (decoded as IDecodedToken).id.toString();
+    res.locals.id = (decoded as IDecodedToken).id;
   } catch (err) {
     return res.status(401).json({ error: 'Invalid or expired token.' });
   }

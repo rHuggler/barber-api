@@ -7,7 +7,7 @@ export const appointmentSchema = yup.object().shape({
   providerId: yup.number().required(),
 });
 
-export async function validateDate(id: number, date: string): Promise<string|undefined> {
+export async function validateDate(id: number, date: string): Promise<string | undefined> {
   const hourStart = startOfHour(parseISO(date));
 
   if (isBefore(hourStart, new Date())) {

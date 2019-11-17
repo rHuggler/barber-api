@@ -3,6 +3,7 @@ import multer from 'multer';
 
 import AppointmentController from './app/controllers/AppointmentController';
 import FileController from './app/controllers/FileController';
+import NotificationController from './app/controllers/NotificationController';
 import ProviderController from './app/controllers/ProviderController';
 import ScheduleController from './app/controllers/ScheduleController';
 import SessionController from './app/controllers/SessionController';
@@ -38,7 +39,17 @@ routes.route('/appointments')
   .post([userAuth], AppointmentController.create)
   .get([userAuth], AppointmentController.list);
 
+routes.route('/appointments/:id')
+  .delete([userAuth], AppointmentController.delete)
+  .get([userAuth], AppointmentController.show);
+
 routes.route('/schedules')
   .get([userAuth], ScheduleController.list);
+
+routes.route('/notifications')
+  .get([userAuth], NotificationController.list);
+
+routes.route('/notifications/:id')
+  .put([userAuth], NotificationController.update);
 
 export default routes;

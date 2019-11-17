@@ -1,6 +1,7 @@
-import { format, parseISO, startOfHour } from 'date-fns';
+import { format, isBefore, parseISO, startOfHour, subHours } from 'date-fns';
 import { Request, Response } from 'express';
 
+// import Mail from '../../lib/Mail';
 import Appointment from '../entities/models/Appointment';
 import User from '../entities/models/User';
 import Notification from '../entities/schemas/Notification';
@@ -13,6 +14,10 @@ class AppointmentController {
     }
 
     const { providerId, date } = req.body;
+
+    if (providerId === res.locals.id) {
+      return res.status(400).json({ error: 'Provider cannot create an appointment for itself.' });
+    }
 
     const isProvider = await User.getRepository()
       .createQueryBuilder()
@@ -68,6 +73,7 @@ class AppointmentController {
       .where({ providerId: res.locals.id, canceledAt: null })
       .leftJoinAndSelect('appointment.providerId', 'provider')
       .leftJoinAndSelect('provider.avatarId', 'avatar')
+      .loadRelationIdAndMap('appointment.userId', 'appointment.userId')
       .take(resultsPerPage)
       .skip(skip)
       .getMany();
@@ -76,13 +82,49 @@ class AppointmentController {
   }
 
   async show(req: Request, res: Response): Promise<Response> {
-    const appointments = await Appointment.getRepository()
-      .createQueryBuilder()
+    const appointment = await Appointment.getRepository()
+      .createQueryBuilder('appointment')
+      .leftJoinAndSelect('appointment.providerId', 'provider')
+      .leftJoinAndSelect('provider.avatarId', 'avatar')
+      .loadRelationIdAndMap('appointment.userId', 'appointment.userId')
       .where({ id: req.params.id })
-      .loadAllRelationIds()
       .getOne();
 
-    return res.status(200).json(appointments);
+    if (!appointment) {
+      return res.status(400).json({ error: 'Appointment does not exists.' });
+    }
+
+    return res.status(200).json(appointment);
+  }
+
+  async delete(req: Request, res: Response): Promise<Response> {
+    const appointment = await Appointment.getRepository()
+      .createQueryBuilder('appointment')
+      .leftJoin('appointment.providerId', 'provider')
+      .addSelect(['provider.name', 'provider.email'])
+      .loadRelationIdAndMap('appointment.userId', 'appointment.userId')
+      .where({ id: req.params.id })
+      .getOne();
+
+    if (!appointment) {
+      return res.status(400).json({ error: 'Appointment does not exists.' });
+    }
+
+    if (appointment.userId !== res.locals.id) {
+      return res.status(401).json({ error: 'User does not have permission to cancel this appointment.' });
+    }
+
+    const maxHours = subHours(appointment.date, 2);
+
+    if (isBefore(maxHours, new Date())) {
+      return res.status(401).json({ error: 'You can only cancel appointments 2 hours in advance.' });
+    }
+
+    appointment.canceledAt = new Date();
+
+    await appointment.save();
+
+    return res.status(200).json(appointment);
   }
 }
 

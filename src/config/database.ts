@@ -28,6 +28,6 @@ export const postgresConfig: PostgresOptions = {
 
 export const mongoConfig: MongoOptions = {
   useNewUrlParser: true,
-  useFindAndModify: true,
+  useFindAndModify: false,
   useUnifiedTopology: true,
 };
