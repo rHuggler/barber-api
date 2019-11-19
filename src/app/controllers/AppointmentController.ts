@@ -2,6 +2,7 @@ import { format, isBefore, parseISO, startOfHour, subHours } from 'date-fns';
 import { Request, Response } from 'express';
 
 // import Mail from '../../lib/Mail';
+import Mail from '../../lib/Mail';
 import Appointment from '../entities/models/Appointment';
 import User from '../entities/models/User';
 import Notification from '../entities/schemas/Notification';
@@ -101,8 +102,8 @@ class AppointmentController {
     const appointment = await Appointment.getRepository()
       .createQueryBuilder('appointment')
       .leftJoin('appointment.provider', 'provider')
-      .addSelect(['provider.name', 'provider.email'])
-      .loadRelationIdAndMap('appointment.user', 'appointment.user')
+      .leftJoin('appointment.user', 'user')
+      .addSelect(['provider.name', 'provider.email', 'user.name', 'user.id'])
       .where({ id: req.params.id })
       .getOne();
 
@@ -110,7 +111,7 @@ class AppointmentController {
       return res.status(400).json({ error: 'Appointment does not exists.' });
     }
 
-    if (appointment.user !== res.locals.id) {
+    if (appointment.user.id !== res.locals.id) {
       return res.status(401).json({ error: 'User does not have permission to cancel this appointment.' });
     }
 
@@ -123,6 +124,17 @@ class AppointmentController {
     appointment.canceledAt = new Date();
 
     await appointment.save();
+
+    const hourStart = startOfHour(appointment.date);
+    const formattedDate = format(hourStart, 'MMMM do');
+    const formattedTime = format(hourStart, 'h:mma');
+
+    Mail.sendMail({
+      to: `${appointment.provider.name} <${appointment.provider.email}>`,
+      subject: 'Canceled Appointment',
+      text:
+        `Your ${formattedDate} ${formattedTime} appointment with ${appointment.user.name} was canceled.`,
+    });
 
     return res.status(200).json(appointment);
   }
