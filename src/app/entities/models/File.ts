@@ -1,14 +1,13 @@
 import {
   AfterLoad,
-  BaseEntity,
   Column,
-  CreateDateColumn,
   Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn} from 'typeorm';
+  PrimaryGeneratedColumn } from 'typeorm';
+
+import BaseEntityWithTimestamps from './';
 
 @Entity()
-export default class File extends BaseEntity {
+export default class File extends BaseEntityWithTimestamps {
   @PrimaryGeneratedColumn()
   id!: number;
 
@@ -17,12 +16,6 @@ export default class File extends BaseEntity {
 
   @Column()
   path!: string;
-
-  @CreateDateColumn({ name: 'created_at', select: false })
-  createdAt!: Date;
-
-  @UpdateDateColumn({ name: 'updated_at', select: false })
-  updatedAt!: Date;
 
   protected url!: string;
 

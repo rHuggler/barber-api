@@ -13,22 +13,22 @@ class AppointmentController {
       return res.status(400).json({ error: 'Incorrect or missing payload.' });
     }
 
-    const { providerId, date } = req.body;
+    const { provider, date } = req.body;
 
-    if (providerId === res.locals.id) {
+    if (provider === res.locals.id) {
       return res.status(400).json({ error: 'Provider cannot create an appointment for itself.' });
     }
 
     const isProvider = await User.getRepository()
       .createQueryBuilder()
-      .where({ id: providerId, provider: true })
+      .where({ id: provider, provider: true })
       .getOne();
 
     if (!isProvider) {
       return res.status(400).json({ error: 'User is not provider.' });
     }
 
-    const dateError = await validateDate(providerId, date);
+    const dateError = await validateDate(provider, date);
 
     if (dateError) {
       return res.status(400).json({ error: dateError });
@@ -37,9 +37,9 @@ class AppointmentController {
     const hourStart = startOfHour(parseISO(date));
 
     const appointment = await Appointment.create({
-      userId: res.locals.id,
-      providerId: req.body.providerId,
+      user: res.locals.id,
       date: hourStart,
+      provider: req.body.provider as any,
     }).save();
 
     const user = await User.getRepository()
@@ -57,7 +57,7 @@ class AppointmentController {
 
     await Notification.create({
       content: `New appointment for ${user.name} on ${formattedDate} at ${formattedTime}`,
-      user: req.body.providerId,
+      user: req.body.provider,
     });
 
     return res.status(200).json(appointment);
@@ -70,10 +70,10 @@ class AppointmentController {
 
     const appointments = await Appointment.getRepository()
       .createQueryBuilder('appointment')
-      .where({ providerId: res.locals.id, canceledAt: null })
-      .leftJoinAndSelect('appointment.providerId', 'provider')
-      .leftJoinAndSelect('provider.avatarId', 'avatar')
-      .loadRelationIdAndMap('appointment.userId', 'appointment.userId')
+      .where({ provider: res.locals.id, canceledAt: null })
+      .leftJoinAndSelect('appointment.provider', 'provider')
+      .leftJoinAndSelect('provider.avatar', 'avatar')
+      .loadRelationIdAndMap('appointment.user', 'appointment.user')
       .take(resultsPerPage)
       .skip(skip)
       .getMany();
@@ -84,9 +84,9 @@ class AppointmentController {
   async show(req: Request, res: Response): Promise<Response> {
     const appointment = await Appointment.getRepository()
       .createQueryBuilder('appointment')
-      .leftJoinAndSelect('appointment.providerId', 'provider')
-      .leftJoinAndSelect('provider.avatarId', 'avatar')
-      .loadRelationIdAndMap('appointment.userId', 'appointment.userId')
+      .leftJoinAndSelect('appointment.provider', 'provider')
+      .leftJoinAndSelect('provider.avatar', 'avatar')
+      .loadRelationIdAndMap('appointment.user', 'appointment.user')
       .where({ id: req.params.id })
       .getOne();
 
@@ -100,9 +100,9 @@ class AppointmentController {
   async delete(req: Request, res: Response): Promise<Response> {
     const appointment = await Appointment.getRepository()
       .createQueryBuilder('appointment')
-      .leftJoin('appointment.providerId', 'provider')
+      .leftJoin('appointment.provider', 'provider')
       .addSelect(['provider.name', 'provider.email'])
-      .loadRelationIdAndMap('appointment.userId', 'appointment.userId')
+      .loadRelationIdAndMap('appointment.user', 'appointment.user')
       .where({ id: req.params.id })
       .getOne();
 
@@ -110,7 +110,7 @@ class AppointmentController {
       return res.status(400).json({ error: 'Appointment does not exists.' });
     }
 
-    if (appointment.userId !== res.locals.id) {
+    if (appointment.user !== res.locals.id) {
       return res.status(401).json({ error: 'User does not have permission to cancel this appointment.' });
     }
 

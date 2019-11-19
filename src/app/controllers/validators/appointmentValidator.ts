@@ -4,7 +4,7 @@ import Appointment from '../../entities/models/Appointment';
 
 export const appointmentSchema = yup.object().shape({
   date: yup.string().required(),
-  providerId: yup.number().required(),
+  provider: yup.number().required(),
 });
 
 export async function validateDate(id: number, date: string): Promise<string | undefined> {
@@ -16,7 +16,7 @@ export async function validateDate(id: number, date: string): Promise<string | u
 
   const appointment = await Appointment.getRepository()
     .createQueryBuilder()
-    .where({ providerId: id, canceledAt: null, date: hourStart })
+    .where({ provider: id, canceledAt: null, date: hourStart })
     .getOne();
 
   if (appointment) {

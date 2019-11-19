@@ -22,8 +22,8 @@ class UserController {
 
     const user = await User.create(req.body).save();
 
-    const { id, name, provider, avatarId } = user;
-    return res.status(200).json({ id, name, email, provider, avatarId });
+    const { id, name, provider, avatar } = user;
+    return res.status(200).json({ id, name, email, provider, avatar });
   }
 
   async show(req: Request, res: Response): Promise<Response> {
@@ -54,7 +54,9 @@ class UserController {
       return res.status(400).json({ error: 'Incorrect or missing payload.' });
     }
 
-    if (req.params.id !== res.locals.id) {
+    if (parseInt(req.params.id, 10) !== res.locals.id) {
+      console.log('params', typeof req.params.id);
+      console.log('locals', typeof res.locals.id);
       return res.status(401).json({ error: 'Invalid or expired token.' });
     }
 

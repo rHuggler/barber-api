@@ -21,7 +21,7 @@ class ScheduleController {
     const appointments = await Appointment.getRepository()
       .createQueryBuilder()
       .where({
-        providerId: res.locals.id,
+        provider: res.locals.id,
         canceledAt: null,
         date: Between(startOfDay(date), endOfDay(date)),
       })

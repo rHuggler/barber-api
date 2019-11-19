@@ -1,19 +1,19 @@
 import { compareSync, hashSync } from 'bcryptjs';
 import { randomBytes } from 'crypto';
 import {
-  BaseEntity,
   BeforeInsert,
   BeforeUpdate,
   Column,
-  CreateDateColumn,
   Entity,
   JoinColumn,
   OneToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn} from 'typeorm';
+  PrimaryGeneratedColumn } from 'typeorm';
+
+import BaseEntityWithTimestamps from './';
+import File from './File';
 
 @Entity()
-export default class User extends BaseEntity {
+export default class User extends BaseEntityWithTimestamps {
   @PrimaryGeneratedColumn()
   id!: number;
 
@@ -31,17 +31,11 @@ export default class User extends BaseEntity {
   })
   provider!: boolean;
 
-  @OneToOne('File')
+  @OneToOne(() => File)
   @JoinColumn({
     name: 'avatar_id',
   })
-  avatarId!: number;
-
-  @CreateDateColumn({ name: 'created_at', select: false })
-  createdAt!: Date;
-
-  @UpdateDateColumn({ name: 'updated_at', select: false})
-  updatedAt!: Date;
+  avatar!: File;
 
   @BeforeInsert()
   @BeforeUpdate()

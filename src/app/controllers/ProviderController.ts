@@ -6,7 +6,7 @@ class ProviderController {
   async list(_req: Request, res: Response): Promise<Response> {
     const providers = await User.getRepository()
       .createQueryBuilder('user')
-      .leftJoin('user.avatarId', 'avatar')
+      .leftJoin('user.avatar', 'avatar')
       .select([ 'user.id', 'user.name', 'user.email', 'avatar.name', 'avatar.path' ])
       .where({ provider: true })
       .getMany();

@@ -1,15 +1,15 @@
 import {
-  BaseEntity,
   Column,
-  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn } from 'typeorm';
+  PrimaryGeneratedColumn } from 'typeorm';
+
+import BaseEntityWithTimestamps from './';
+import User from './User';
 
 @Entity()
-export default class Appointment extends BaseEntity {
+export default class Appointment extends BaseEntityWithTimestamps {
   @PrimaryGeneratedColumn()
   id!: number;
 
@@ -19,21 +19,15 @@ export default class Appointment extends BaseEntity {
   @Column({ name: 'canceled_at', nullable: true })
   canceledAt!: Date;
 
-  @ManyToOne('User')
+  @ManyToOne(() => User)
   @JoinColumn({
     name: 'user_id',
   })
-  userId!: number;
+  user!: User;
 
-  @ManyToOne('User')
+  @ManyToOne(() => User)
   @JoinColumn({
     name: 'provider_id',
   })
-  providerId!: number;
-
-  @CreateDateColumn({ name: 'created_at', select: false })
-  createdAt!: Date;
-
-  @UpdateDateColumn({ name: 'updated_at', select: false})
-  updatedAt!: Date;
+  provider!: User;
 }
