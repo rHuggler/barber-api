@@ -1,11 +1,11 @@
 import { format, isBefore, parseISO, startOfHour, subHours } from 'date-fns';
 import { Request, Response } from 'express';
 
-// import Mail from '../../lib/Mail';
-import Mail from '../../lib/Mail';
+import Queue from '../../lib/Queue';
 import Appointment from '../entities/models/Appointment';
 import User from '../entities/models/User';
 import Notification from '../entities/schemas/Notification';
+import AppointmentCancelMail from '../jobs/AppointmentCancelMail';
 import { appointmentSchema, validateDate } from './validators/appointmentValidator';
 
 class AppointmentController {
@@ -74,7 +74,9 @@ class AppointmentController {
       .where({ provider: res.locals.id, canceledAt: null })
       .leftJoinAndSelect('appointment.provider', 'provider')
       .leftJoinAndSelect('provider.avatar', 'avatar')
-      .loadRelationIdAndMap('appointment.user', 'appointment.user')
+      .leftJoin('appointment.user', 'user')
+      .addSelect(['user.id', 'user.name', 'user.email'])
+      .orderBy('appointment.date', 'DESC')
       .take(resultsPerPage)
       .skip(skip)
       .getMany();
@@ -121,6 +123,10 @@ class AppointmentController {
       return res.status(401).json({ error: 'You can only cancel appointments 2 hours in advance.' });
     }
 
+    if (appointment.canceledAt) {
+      return res.status(400).json({ error: 'Appointment already canceled.' });
+    }
+
     appointment.canceledAt = new Date();
 
     await appointment.save();
@@ -129,11 +135,12 @@ class AppointmentController {
     const formattedDate = format(hourStart, 'MMMM do');
     const formattedTime = format(hourStart, 'h:mma');
 
-    Mail.sendMail({
-      to: `${appointment.provider.name} <${appointment.provider.email}>`,
-      subject: 'Canceled Appointment',
-      text:
-        `Your ${formattedDate} ${formattedTime} appointment with ${appointment.user.name} was canceled.`,
+    await Queue.addJob(AppointmentCancelMail.key, {
+      appointment,
+      datetime: {
+        date: formattedDate,
+        time: formattedTime,
+      },
     });
 
     return res.status(200).json(appointment);
