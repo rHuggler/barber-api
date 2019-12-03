@@ -26,8 +26,10 @@ class Queue {
   processQueues() {
     this.jobs.forEach((job) => {
       const { bull, handle } = this.queues[job.key];
+
       console.log(`Inicializando fila ${job.key}`);
-      bull.process(handle);
+      bull.process(handle)
+        .catch((error) => console.error(error));
     });
   }
 
