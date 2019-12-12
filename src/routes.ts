@@ -29,6 +29,9 @@ routes.route('/users/:id/password')
 routes.route('/providers')
   .get(ProviderController.list);
 
+routes.route('/providers/:id/available')
+  .get(ProviderController.available);
+
 routes.route('/sessions')
   .post(SessionController.create);
 

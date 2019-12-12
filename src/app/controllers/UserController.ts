@@ -55,8 +55,6 @@ class UserController {
     }
 
     if (parseInt(req.params.id, 10) !== res.locals.id) {
-      console.log('params', typeof req.params.id);
-      console.log('locals', typeof res.locals.id);
       return res.status(401).json({ error: 'Invalid or expired token.' });
     }
 

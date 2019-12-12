@@ -1,10 +1,12 @@
 import {
+  AfterLoad,
   Column,
   Entity,
   JoinColumn,
   ManyToOne,
-  PrimaryGeneratedColumn } from 'typeorm';
+  PrimaryGeneratedColumn} from 'typeorm';
 
+import { isBefore, subHours } from 'date-fns';
 import BaseEntityWithTimestamps from './';
 import User from './User';
 
@@ -30,4 +32,18 @@ export default class Appointment extends BaseEntityWithTimestamps {
     name: 'provider_id',
   })
   provider!: User;
+
+  protected past!: boolean;
+
+  protected cancellable!: boolean;
+
+  @AfterLoad()
+  getPast() {
+    this.past = isBefore(this.date, new Date());
+  }
+
+  @AfterLoad()
+  getCancellable() {
+    this.cancellable = isBefore(new Date(), subHours(this.date, 2));
+  }
 }
