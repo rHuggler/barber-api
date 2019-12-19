@@ -6,6 +6,9 @@ import {
 
 import BaseEntityWithTimestamps from './';
 
+const APP_URL = process.env.APP_URL || 'localhost';
+const APP_PORT = process.env.APP_PORT || '5000';
+
 @Entity()
 export default class File extends BaseEntityWithTimestamps {
   @PrimaryGeneratedColumn()
@@ -21,6 +24,6 @@ export default class File extends BaseEntityWithTimestamps {
 
   @AfterLoad()
   getUrl() {
-    this.url = `http://localhost:5000/files/${this.path}`;
+    this.url = `${APP_URL}:${APP_PORT}/files/${this.path}`;
   }
 }

@@ -1,6 +1,7 @@
 import Bull from 'bull';
 import IJob from '../app/jobs';
 import AppointmentCancelMail, { IAppointmentCancelMail } from '../app/jobs/AppointmentCancelMail';
+import { bullConfig } from '../config/queue';
 
 interface IQueue {
   [key: string]: {
@@ -36,7 +37,7 @@ class Queue {
   private init() {
     this.jobs.forEach((job) => {
       this.queues[job.key] = {
-        bull: new Bull(job.key),
+        bull: new Bull(job.key, bullConfig),
         handle: job.handle,
       };
     });

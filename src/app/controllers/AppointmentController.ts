@@ -69,6 +69,8 @@ class AppointmentController {
 
     const skip = (parseInt(req.params.page, 10) * resultsPerPage) || 0;
 
+    throw new Error('senty');
+
     const appointments = await Appointment.getRepository()
       .createQueryBuilder('appointment')
       .where({ provider: res.locals.id, canceledAt: null })
